@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   DndContext,
   DragOverlay,
@@ -40,13 +40,19 @@ const Schedule = ({
   next?: string;
   prev?: string;
 }) => {
-  const [operations, setOperations] = ops
-    ? useState<OperationResponse[] | null>(ops)
-    : useState<OperationResponse[] | null>(null);
+  const [operations, setOperations] = useState<OperationResponse[] | null>(
+    null
+  );
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSchedule, setActiveSchedule] = useState<string | null>(null);
   const isCfsz = operations && isConflictSerializable(operations);
-  const queryClient = useQueryClient(); // Access the query client
+  const queryClient = useQueryClient();
+
+  // Sync local state with ops prop
+  useEffect(() => {
+    setOperations(ops);
+  }, [ops]);
+
   // Mutation to move an operation to another schedule
   const { mutate } = useMutation({
     mutationFn: ({
@@ -59,7 +65,6 @@ const Schedule = ({
     onSuccess: (data) => {
       console.log("Operation moved successfully:", data);
       queryClient.invalidateQueries({ queryKey: ["schedules"] });
-      // Optionally, you can invalidate queries or update local state here
     },
     onError: (error) => {
       console.error("Error moving operation:", error);
@@ -109,28 +114,10 @@ const Schedule = ({
     setActiveId(null);
     setActiveSchedule(null);
   };
+
   const handleClick = (id: string, whereTo: string) => {
     mutate({ operationId: id, scheduleId: whereTo });
   };
-
-  // // Handle drag over from another schedule
-  // const handleDragOver = (event: DragEndEvent) => {
-  //   const { active, over } = event;
-
-  //   if (over && activeSchedule !== scheduleId) {
-  //     setOperations((items) => {
-  //       const currentItems = items || [];
-  //       const activeItem = currentItems.find((item) => item.id === active.id);
-
-  //       if (activeItem) {
-  //         // Add the item to the new schedule
-  //         return [...currentItems, activeItem];
-  //       }
-
-  //       return currentItems;
-  //     });
-  //   }
-  // };
 
   // Get the active item for the overlay
   const activeItem = operations?.find((op) => op.id === activeId);
@@ -141,7 +128,6 @@ const Schedule = ({
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      // onDragOver={handleDragOver}
     >
       <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px]">
         <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
@@ -156,7 +142,7 @@ const Schedule = ({
             items={operations}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-2 w-full flex flex-col items-center justify-center  ">
+            <div className="space-y-2 w-full flex flex-col items-center justify-center">
               {operations.map((operation) => {
                 return (
                   <div
