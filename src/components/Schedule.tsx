@@ -129,7 +129,7 @@ const Schedule = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px]">
+      <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px] h-[650px]">
         <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
         <p
           className={`${isCfsz ? "text-green-500" : "text-red-500"} mt-1 mb-2`}
@@ -142,7 +142,7 @@ const Schedule = ({
             items={operations}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-2 w-full flex flex-col items-center justify-center">
+            <div className="space-y-2 w-full flex flex-col items-center h-[550px] justify-center">
               {operations.map((operation) => {
                 return (
                   <div
