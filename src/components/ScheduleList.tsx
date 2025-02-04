@@ -17,6 +17,7 @@ const ScheduleList = () => {
 
         return (
           <Schedule
+            //passing the props down
             scheduleName={schedule.name}
             key={schedule.id}
             ops={schedule.operations}
