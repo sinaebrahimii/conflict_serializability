@@ -32,7 +32,7 @@ const DialogForm = () => {
     <div className="p-6">
       <button
         onClick={openDialog}
-        className="bg-baby-blue text-gray-950 px-4 py-2 rounded hover:scale-105 transform"
+        className="bg-baby-blue text-gray-950 px-4 py-2 rounded hover:scale-105 "
       >
         Generate Schedules
       </button>
