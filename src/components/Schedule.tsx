@@ -16,36 +16,32 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { isConflictSerializable } from "../utils/conflictSerialize";
-import { OperationResponse } from "../utils/api";
+import { Operation } from "../utils/api";
 import SortableOperation from "./SortableOperation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { moveOperationToSchedule } from "../utils/api";
+import { moveOperationToSchedule, changeOrder } from "../utils/api";
 
 // Main Component
 const Schedule = ({
   ops,
   scheduleName,
-  scheduleId,
+  transactionId,
   last,
   first,
   next,
   prev,
 }: {
-  ops: OperationResponse[];
+  ops: Operation[];
   scheduleName: string;
-  scheduleId: string;
+  transactionId: string;
   last?: string;
   first?: string;
   next?: string;
   prev?: string;
 }) => {
-  const [operations, setOperations] = useState<OperationResponse[] | null>(
-    null
-  );
+  const [operations, setOperations] = useState<Operation[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSchedule, setActiveSchedule] = useState<string | null>(null);
-  const isCfsz = operations && isConflictSerializable(operations);
   const queryClient = useQueryClient();
 
   // Sync local state with ops prop
@@ -70,7 +66,27 @@ const Schedule = ({
       console.error("Error moving operation:", error);
     },
   });
-
+  const { mutate: oerderMutate } = useMutation({
+    mutationFn: ({
+      newOrder,
+      newOrder2,
+      opId,
+      op2Id,
+    }: {
+      newOrder: string;
+      newOrder2: string;
+      opId: string;
+      op2Id: string;
+    }) => changeOrder(newOrder, newOrder2, opId, op2Id),
+    onSuccess: (data) => {
+      console.log("Operation reordered successfully:", data);
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      // setOperations(data.operations);
+    },
+    onError: (error) => {
+      console.error("Error reordering operation:", error);
+    },
+  });
   // Sensors for pointer and keyboard interactions
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -82,7 +98,7 @@ const Schedule = ({
   // Handle drag start
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
-    setActiveSchedule(scheduleId);
+    setActiveSchedule(transactionId);
   };
 
   // Handle drag end
@@ -93,7 +109,7 @@ const Schedule = ({
       setOperations((items) => {
         const currentItems = items || [];
         // If the operation is dropped within the same schedule
-        if (activeSchedule === scheduleId) {
+        if (activeSchedule === transactionId) {
           const oldIndex = currentItems.findIndex(
             (item) => item.id === active.id
           );
@@ -104,6 +120,12 @@ const Schedule = ({
           if (oldIndex === -1 || newIndex === -1) {
             return currentItems;
           }
+          oerderMutate({
+            newOrder: ops[newIndex].order, // Pass the new index as the order
+            newOrder2: ops[oldIndex].order, // Pass the new index as the order
+            opId: active.id as string, // Pass the ID of the dragged item
+            op2Id: over.id as string, // Pass the ID of the dragged item
+          });
           return arrayMove(currentItems, oldIndex, newIndex);
         }
 
@@ -129,33 +151,33 @@ const Schedule = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px] h-[650px]">
-        <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
-        <p
-          className={`${isCfsz ? "text-green-500" : "text-red-500"} mt-1 mb-2`}
-        >
-          {isCfsz ? "This is conflict serializable" : "graph has cycle"}
-        </p>
+      <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px] h-full">
+        <div className="">
+          <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
+        </div>
 
         {operations && (
           <SortableContext
             items={operations}
             strategy={verticalListSortingStrategy}
           >
-            <div className="space-y-2 w-full flex flex-col items-center h-[550px] justify-center">
+            <div
+              className={`mt-4 h-full grid  grid-flow-row grid-rows-8 w-full `}
+            >
               {operations.map((operation) => {
                 return (
                   <div
-                    className="flex items-baseline gap-1 w-full justify-center"
+                    className={`flex my-1 items-baseline gap-1 w-full justify-center row-span-1 border border-t-0 border-r-0 border-l-0  border-b-gray-600   col-span-1`}
                     key={operation.id}
+                    style={{ gridRowStart: operation.order }}
                   >
                     <span
                       className={`cursor-pointer ${
-                        first === scheduleId && "text-gray-600"
+                        first === transactionId && "text-gray-600"
                       }`}
                       onClick={() =>
                         prev &&
-                        first !== scheduleId &&
+                        first !== transactionId &&
                         handleClick(operation.id, prev)
                       }
                     >
@@ -164,11 +186,11 @@ const Schedule = ({
                     <SortableOperation operation={operation} />
                     <span
                       className={`cursor-pointer ${
-                        last === scheduleId && "text-gray-600"
+                        last === transactionId && "text-gray-600"
                       }`}
                       onClick={() =>
                         next &&
-                        last !== scheduleId &&
+                        last !== transactionId &&
                         handleClick(operation.id, next)
                       }
                     >
@@ -184,7 +206,7 @@ const Schedule = ({
         <DragOverlay>
           {activeItem ? (
             <div className="text-center bg-blue-800 text-white rounded-2xl p-2 opacity-80">
-              {`${activeItem.method}${activeItem.transaction}(${activeItem.variable})`}
+              {`${activeItem.method}(${activeItem.variable})`}
             </div>
           ) : null}
         </DragOverlay>
