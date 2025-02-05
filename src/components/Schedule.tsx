@@ -24,6 +24,7 @@ import { moveOperationToSchedule, changeOrder } from "../utils/api";
 // Main Component
 const Schedule = ({
   ops,
+  totalOps,
   scheduleName,
   transactionId,
   last,
@@ -32,6 +33,7 @@ const Schedule = ({
   prev,
 }: {
   ops: Operation[];
+  totalOps: number;
   scheduleName: string;
   transactionId: string;
   last?: string;
@@ -66,6 +68,7 @@ const Schedule = ({
       console.error("Error moving operation:", error);
     },
   });
+  console.log("totalOPS:", totalOps);
   const { mutate: oerderMutate } = useMutation({
     mutationFn: ({
       newOrder,
@@ -151,7 +154,7 @@ const Schedule = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col justify-center items-center bg-gray-700 p-4 rounded-2xl w-[250px] h-full">
+      <div className="flex flex-col    justify-center items-center bg-gray-800 p-4 rounded-2xl w-[250px] h-full">
         <div className="">
           <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
         </div>
@@ -162,7 +165,10 @@ const Schedule = ({
             strategy={verticalListSortingStrategy}
           >
             <div
-              className={`mt-4 h-full grid  grid-flow-row grid-rows-8 w-full `}
+              className={`mt-4 h-full grid  grid-flow-row   w-full `}
+              style={{
+                gridTemplateRows: `repeat(${totalOps},minmax(0, 1fr))`,
+              }}
             >
               {operations.map((operation) => {
                 return (
@@ -205,7 +211,7 @@ const Schedule = ({
         {/* Drag Overlay (Preview during drag) */}
         <DragOverlay>
           {activeItem ? (
-            <div className="text-center bg-blue-800 text-white rounded-2xl p-2 opacity-80">
+            <div className="text-center bg-baby-blue text-gray-950 rounded-2xl p-2 opacity-80">
               {`${activeItem.method}(${activeItem.variable})`}
             </div>
           ) : null}

@@ -1,6 +1,9 @@
 export interface Schedule {
   id: string;
   name: string;
+  variable_num: number;
+  transaction_num: number;
+  transaction_len: number;
   transactions: Transaction[]; // One-to-many relationship with Transaction
 }
 
@@ -25,7 +28,7 @@ const API_BASE_URL = "http://127.0.0.1:8000";
 
 export async function getSchedules(): Promise<Schedule> {
   try {
-    const response = await fetch(`${API_BASE_URL}/schedule/2`, {
+    const response = await fetch(`${API_BASE_URL}/schedule/3`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -102,3 +105,35 @@ export const changeOrder = async (
     throw error; // Re-throw the error for handling in the component
   }
 };
+
+// Function to post transaction data
+export async function postRandomTransactionData(
+  trNum: number,
+  trLen: number,
+  varNum: number
+) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedule`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        variable_num: varNum,
+        transaction_num: trNum,
+        transaction_len: trLen,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("random data created");
+    return data;
+  } catch (error) {
+    console.error("Error posting data:", error);
+    throw error;
+  }
+}

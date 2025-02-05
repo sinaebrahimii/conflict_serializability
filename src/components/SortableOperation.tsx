@@ -18,9 +18,9 @@ const SortableOperation = ({ operation }: { operation: Operation }) => {
       style={style}
       {...attributes}
       {...listeners}
-      className="text-center w-14 bg-blue-700 text-white rounded-2xl p-2 mb-2 cursor-grab active:cursor-grabbing"
+      className="text-center w-14 bg-baby-blue text-gray-950 rounded-2xl p-2 mb-2 cursor-grab active:cursor-grabbing"
     >
-      {`${operation.method}(${operation.variable})${operation.order}`}
+      {`${operation.method}(${operation.variable})`}
     </div>
   );
 };
