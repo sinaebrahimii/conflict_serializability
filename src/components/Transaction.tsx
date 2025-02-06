@@ -22,7 +22,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { moveOperationToSchedule, changeOrder } from "../utils/api";
 
 // Main Component
-const Schedule = ({
+const Transaction = ({
   ops,
   totalOps,
   scheduleName,
@@ -221,4 +221,4 @@ const Schedule = ({
   );
 };
 
-export default Schedule;
+export default Transaction;

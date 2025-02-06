@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postRandomTransactionData } from "../utils/api";
 interface RandomScheduleFormProps {
   closeDialog: () => void;
@@ -14,6 +14,8 @@ type FormValues = {
 export const RandomScheduleForm = ({
   closeDialog,
 }: RandomScheduleFormProps) => {
+  const queryClient = useQueryClient();
+
   const { mutate } = useMutation({
     mutationFn: ({
       trNum,
@@ -24,6 +26,9 @@ export const RandomScheduleForm = ({
       varNum: number;
       trLen: number;
     }) => postRandomTransactionData(trNum, trLen, varNum),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["allSchedules"] });
+    },
   });
   const {
     register,

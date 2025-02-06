@@ -1,14 +1,12 @@
 import "./App.css";
-import ScheduleList from "./components/ScheduleList";
+import TransactionList from "./components/TransactionList";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import DialogForm from "./components/DialogForm";
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ScheduleList />
-      <DialogForm />
+      <TransactionList />
     </QueryClientProvider>
   );
 }

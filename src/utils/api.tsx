@@ -26,9 +26,9 @@ export interface Operation {
 // api.ts
 const API_BASE_URL = "http://127.0.0.1:8000";
 
-export async function getSchedules(): Promise<Schedule> {
+export async function getSchedules(id: string | undefined): Promise<Schedule> {
   try {
-    const response = await fetch(`${API_BASE_URL}/schedule/3`, {
+    const response = await fetch(`${API_BASE_URL}/schedule/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -41,6 +41,27 @@ export async function getSchedules(): Promise<Schedule> {
     }
 
     const data: Schedule = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching schedules:", error);
+    throw error;
+  }
+}
+export async function getAllSchedules(): Promise<Schedule[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedule/`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    });
+    console.log("fetching schedules!");
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data: Schedule[] = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching schedules:", error);
