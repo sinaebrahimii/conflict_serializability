@@ -158,3 +158,69 @@ export async function postRandomTransactionData(
     throw error;
   }
 }
+
+export async function createOperation(
+  order: string, // Stored as string to preserve leading zeros
+  method: "r" | "w", // 'r' or 'w'
+  variable: string, // Single character variable name
+  transaction_id: string // Foreign key to Transaction
+) {
+  const payload = {
+    order: `${order}`,
+    method: method,
+    variable: variable.toUpperCase(),
+    transaction_id: `${transaction_id}`,
+  };
+  console.log(payload);
+  try {
+    const response = await fetch(`${API_BASE_URL}/operations/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("random data created");
+    return data;
+  } catch (error) {
+    console.error("Error posting data:", error);
+    throw error;
+  }
+}
+
+export async function createSchedule(
+  name: string, // Stored as string to preserve leading zeros
+  transaction_num: number // 'r' or 'w'
+) {
+  const payload = {
+    name,
+    transaction_num,
+  };
+  console.log(payload);
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedule/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("random data created");
+    return data;
+  } catch (error) {
+    console.error("Error posting data:", error);
+    throw error;
+  }
+}

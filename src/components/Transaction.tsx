@@ -20,7 +20,8 @@ import { Operation } from "../utils/api";
 import SortableOperation from "./SortableOperation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { moveOperationToSchedule, changeOrder } from "../utils/api";
-
+import DialogForm from "./DialogForm";
+import OperationForm from "./OperationForm";
 // Main Component
 const Transaction = ({
   ops,
@@ -154,10 +155,20 @@ const Transaction = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div className="flex flex-col    justify-center items-center bg-gray-800 p-4 rounded-2xl w-[250px] h-full">
-        <div className="">
-          <p className="text-white text-xl font-bold my-1">{scheduleName}</p>
-        </div>
+      <div className="flex flex-col    justify-center items-center bg-gray-800 p-3 rounded-2xl w-[250px] h-full">
+        <p className="text-white text-xl font-bold my-1 ">{scheduleName}</p>
+        <DialogForm
+          form_number={2}
+          total_ops={totalOps}
+          t_id={transactionId}
+          buttonText="Add more"
+          buttonClassName=" text-baby-blue  hover:scale-105 hover:bg-gray-600 bg-gray-700 flex justify-center items-center gap-2"
+        >
+          <OperationForm
+            transaction_id={transactionId}
+            total_operations={totalOps}
+          />
+        </DialogForm>
 
         {operations && (
           <SortableContext

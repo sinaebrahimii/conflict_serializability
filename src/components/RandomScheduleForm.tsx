@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { postRandomTransactionData } from "../utils/api";
 interface RandomScheduleFormProps {
-  closeDialog: () => void;
+  closeDialog?: () => void;
 }
 
 type FormValues = {
@@ -43,7 +43,7 @@ export const RandomScheduleForm = ({
       varNum: data.variables,
     });
     console.log("Form data:");
-    closeDialog();
+    closeDialog && closeDialog();
   };
 
   return (
