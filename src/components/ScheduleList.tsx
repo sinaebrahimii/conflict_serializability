@@ -26,16 +26,19 @@ const ScheduleList = () => {
         <ManualForm />
       </DialogForm>
       <ul className="space-y-5">
-        {schedules?.map((sch) => (
-          <Schedule
-            key={sch.id}
-            name={sch.name}
-            variables={sch.variable_num}
-            transactions={sch.transaction_num}
-            id={sch.id}
-            length={sch.transaction_len}
-          />
-        ))}
+        {schedules
+          ?.slice() // Avoid mutating original array
+          .sort((a, b) => Number(b.id) - Number(a.id)) // Convert id to number and sort in descending order
+          .map((sch) => (
+            <Schedule
+              key={sch.id}
+              name={sch.name}
+              variables={sch.variable_num}
+              transactions={sch.transaction_num}
+              id={sch.id}
+              length={sch.transaction_len}
+            />
+          ))}
       </ul>
     </div>
   );

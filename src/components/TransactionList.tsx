@@ -7,7 +7,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { checkTransactionsConflictSerializability } from "../utils/conflictSerialize";
 import { useParams } from "react-router-dom";
-
+import GraphComponent from "./GraphComponent";
 function getTotalOperations(schedule: Readonly<ScheduleT>): number {
   return schedule.transactions.reduce(
     (total: number, transaction: Readonly<TransactionT>) =>
@@ -23,16 +23,19 @@ const TransactionList = () => {
     queryFn: () => getSchedules(scheduleId),
   });
   const totalOps = data ? getTotalOperations(data) : 10;
-  const iscfsz =
-    data && checkTransactionsConflictSerializability(data.transactions);
+  // const serializable =
+  //   data && checkTransactionsConflictSerializability(data.transactions);
+  const { serializable, graph } = data?.transactions
+    ? checkTransactionsConflictSerializability(data.transactions)
+    : { serializable: false, graph: { nodes: [], edges: [] } };
   return (
     <div>
       <h2
         className={`text-center  text-3xl ${
-          iscfsz ? "text-green-600" : "text-red-600"
+          serializable ? "text-green-600" : "text-red-600"
         }`}
       >
-        {iscfsz ? "Conflict Serializable" : "Graph has cycle"}
+        {serializable ? "Conflict Serializable" : "Graph has cycle"}
       </h2>
       <div className="flex justify-center items-center">
         <div className="w-full flex-1 flex justify-center mt-5 items-center gap-4 ">
@@ -77,6 +80,9 @@ const TransactionList = () => {
             </p>
           </div>
         </div>
+      </div>
+      <div>
+        <GraphComponent graph={graph} />
       </div>
     </div>
   );

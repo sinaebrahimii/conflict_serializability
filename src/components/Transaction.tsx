@@ -157,6 +157,7 @@ const Transaction = ({
     >
       <div className="flex flex-col    justify-center items-center bg-gray-800 p-3 rounded-2xl w-[250px] h-full">
         <p className="text-white text-xl font-bold my-1 ">{scheduleName}</p>
+        <p className="text-white text-xl font-bold my-1 ">ID:{transactionId}</p>
         <DialogForm
           form_number={2}
           total_ops={totalOps}
